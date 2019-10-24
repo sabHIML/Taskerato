@@ -6,8 +6,9 @@ use App\Http\Requests\API\CreateTaskAPIRequest;
 use App\Http\Requests\API\UpdateTaskAPIRequest;
 use App\Models\Task;
 use App\Repositories\TaskRepository;
-use Illuminate\Http\Request;
+use App\Services\UserApi;
 use App\Http\Controllers\AppBaseController;
+use Exception;
 
 /**
  * Class TaskController
@@ -25,19 +26,24 @@ class TaskAPIController extends AppBaseController
     }
 
     /**
-     * Display a listing of the Task.
+     * Display a listing of the task and sub-tasks group by each user.
      * GET|HEAD /tasks
      *
-     * @param Request $request
+     * @param UserApi $userApi
      * @return Response
      */
-    public function index(Request $request)
+    public function index(UserApi $userApi)
     {
-        $tasks = $this->taskRepository->all(
-            $request->all()
-        );
+        try {
+            $users = $userApi->mapTasks(
+                $this->taskRepository->getTaskTree()->toArray()
+            );
+        } catch (Exception $e) {
+            // todo log Exception
+            return $this->sendError('Users not found');
+        }
 
-        return $this->sendResponse($tasks->toArray());
+        return $this->sendResponse($users);
     }
 
     /**

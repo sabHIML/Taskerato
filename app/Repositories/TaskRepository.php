@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Task;
-use App\Repositories\BaseRepository;
 
 /**
  * Class TaskRepository
@@ -31,6 +30,20 @@ class TaskRepository extends BaseRepository
     public function getFieldsSearchable()
     {
         return $this->fieldSearchable;
+    }
+
+    /**
+     * Fetch tasks in task/sub-task tree order
+     */
+    public function getTaskTree()
+    {
+        $query = $this->model->newQuery();
+
+        return $query->with('children')
+            ->whereNull('parent_id')
+            ->orderBy('user_id', 'asc')
+            ->get();
+
     }
 
     /**

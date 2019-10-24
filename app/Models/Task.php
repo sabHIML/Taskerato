@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model as Model;
 /**
  * Class Task
  * @package App\Models
- * @version October 23, 2019, 1:16 pm UTC
  *
  * @property integer parent_id
  * @property integer user_id
@@ -52,5 +51,13 @@ class Task extends Model
         'points' => 'required|min:1|max:10',
         'is_done' => 'required|min:0|max:1'
     ];
+
+    /**
+     * each task might have multiple children
+     */
+    public function children()
+    {
+        return $this->hasMany(static::class, 'parent_id')->orderBy('title', 'asc');
+    }
 
 }
