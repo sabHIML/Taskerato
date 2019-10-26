@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Response;
 
 /**
@@ -10,7 +11,7 @@ use Response;
  */
 class AppBaseController extends Controller
 {
-    public function sendResponse($result, $code = 200, $message = null)
+    public function sendResponse($result, $code = JsonResponse::HTTP_OK, $message = null)
     {
         $res = $result;
 
@@ -25,7 +26,7 @@ class AppBaseController extends Controller
         return Response::json($res, $code);
     }
 
-    public function sendError($error, $code = 500)
+    public function sendError($error, $code = JsonResponse::HTTP_INTERNAL_SERVER_ERROR)
     {
         $res = [
             'message' => 'Error: ' . $error,

@@ -1,10 +1,7 @@
-@import url(https://fonts.googleapis.com/css?family=Nunito);
-
-html,
-body {
+html, body {
     background-color: #fff;
     color: #636b6f;
-    font-family: "Nunito", sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-weight: 200;
     height: 100vh;
     margin: 0;
@@ -15,11 +12,8 @@ body {
 }
 
 .flex-center {
-    -webkit-box-align: center;
     align-items: center;
-    display: -webkit-box;
     display: flex;
-    -webkit-box-pack: center;
     justify-content: center;
 }
 
@@ -36,10 +30,7 @@ body {
 }
 
 .task-container {
-    display: -webkit-box;
     display: flex;
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
     flex-direction: row;
 }
 
@@ -47,4 +38,3 @@ body {
     border: 1px solid #eeeeee;
     padding: 5px;
 }
-

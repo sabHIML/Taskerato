@@ -5,45 +5,48 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateTaskAPIRequest;
 use App\Http\Requests\API\UpdateTaskAPIRequest;
 use App\Models\Task;
-use App\Repositories\TaskRepository;
-use App\Services\UserApi;
+use App\Services\UserServices;
+use App\Services\TaskServices;
 use App\Http\Controllers\AppBaseController;
 use Exception;
+use Illuminate\Http\JsonResponse;
+use InvalidArgumentException;
+
 
 /**
  * Class TaskController
  * @package App\Http\Controllers\API
  */
-
 class TaskAPIController extends AppBaseController
 {
-    /** @var  TaskRepository */
-    private $taskRepository;
+    /** @var  TaskServices */
+    private $taskServices;
 
-    public function __construct(TaskRepository $taskRepo)
+    public function __construct(TaskServices $taskServices)
     {
-        $this->taskRepository = $taskRepo;
+        $this->taskServices = $taskServices;
     }
 
     /**
      * Display a listing of the task and sub-tasks group by each user.
      * GET|HEAD /tasks
      *
-     * @param UserApi $userApi
+     * @param UserServices $userServices
      * @return Response
      */
-    public function index(UserApi $userApi)
+    public function index(UserServices $userServices)
     {
         try {
-            $users = $userApi->mapTasks(
-                $this->taskRepository->getTaskTree()->toArray()
+            $users = $userServices->mapTasks(
+                $this->taskServices->getTaskTree()
             );
         } catch (Exception $e) {
-            // todo log Exception
-            return $this->sendError('Users not found');
+            // todo log Exception $e->getMessage()
+            //echo $e->getMessage();
+            return $this->sendError('Response error!');
         }
 
-        return $this->sendResponse($users);
+        return $this->sendResponse($users, JsonResponse::HTTP_OK, 'user found');
     }
 
     /**
@@ -56,11 +59,17 @@ class TaskAPIController extends AppBaseController
      */
     public function store(CreateTaskAPIRequest $request)
     {
-        $input = $request->all();
+        try {
+            $task = $this->taskServices->create($request->all());
+            return $this->sendResponse($task->toArray(), JsonResponse::HTTP_CREATED);
 
-        $task = $this->taskRepository->create($input);
-
-        return $this->sendResponse($task->toArray(), 201);
+        } catch (InvalidArgumentException $e) {
+            return $this->sendError($e->getMessage(), JsonResponse::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+//            echo $e->getMessage();
+            $msg = is_string($e) ? $e : 'Task creation failed';
+            return $this->sendError($msg);
+        }
     }
 
     /**
@@ -74,17 +83,27 @@ class TaskAPIController extends AppBaseController
      */
     public function update($id, UpdateTaskAPIRequest $request)
     {
-        $input = $request->all();
+        try {
+            $input = $request->all();
 
-        /** @var Task $task */
-        $task = $this->taskRepository->find($id);
+            /** @var Task $task */
+            $thisTask = $this->taskServices->findWithChildCount($id);
 
-        if (empty($task)) {
-            return $this->sendError('Task not found');
+            if (empty($thisTask)) {
+                return $this->sendError('Task not found');
+            }
+
+            $updatedTask = $this->taskServices->update($input, $thisTask->toArray());
+
+            return $this->sendResponse($updatedTask->toArray(), JsonResponse::HTTP_CREATED);
+
+        } catch (InvalidArgumentException $e) {
+            return $this->sendError($e->getMessage(), JsonResponse::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+//            echo $e->getMessage();//todo remove it and write in log
+            $msg = is_string($e) ? $e : 'Task update failed';
+            return $this->sendError($msg);
         }
 
-        $task = $this->taskRepository->update($input, $id);
-
-        return $this->sendResponse($task->toArray(), 201);
     }
 }

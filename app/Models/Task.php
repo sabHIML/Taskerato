@@ -23,7 +23,8 @@ class Task extends Model
         'user_id',
         'title',
         'points',
-        'is_done'
+        'is_done',
+        'email',
     ];
 
     /**
@@ -35,9 +36,11 @@ class Task extends Model
         'id' => 'integer',
         'parent_id' => 'integer',
         'user_id' => 'integer',
+        'email' => 'string',
         'title' => 'string',
         'points' => 'integer',
-        'is_done' => 'integer'
+        'is_done' => 'integer',
+        'done_count' => 'integer'
     ];
 
     /**
@@ -46,10 +49,12 @@ class Task extends Model
      * @var array
      */
     public static $rules = [
-        'user_id' => 'required',
+        'user_id' => 'required|numeric',
+        'parent_id' => 'nullable|numeric',
         'title' => 'required',
-        'points' => 'required|min:1|max:10',
-        'is_done' => 'required|min:0|max:1'
+        'points' => 'required|numeric|min:1|max:10',
+        'is_done' => 'required|numeric|min:0|max:1',
+        'email' => 'email'
     ];
 
     /**
@@ -57,7 +62,7 @@ class Task extends Model
      */
     public function children()
     {
-        return $this->hasMany(static::class, 'parent_id')->orderBy('title', 'asc');
+        return $this->hasMany(static::class, 'parent_id');
     }
 
 }

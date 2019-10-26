@@ -17,6 +17,7 @@ class CreateTasksTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('parent_id')->nullable();
             $table->unsignedInteger('user_id');
+            $table->string('email');
             $table->string('title');
             $table->unsignedInteger('points');
             $table->unsignedTinyInteger('is_done');
