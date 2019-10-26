@@ -6,12 +6,11 @@ task also is done. If at least one subtask of a task marked as not done then it 
 ### Technologies :
 * Laravel
 * Vue.js
-* Docker
 
 ### Developed with :
 * Node 12.1.0
 * Yarn 1.17.0
-* php 7.1.13
+* PHP 7.1.13
 
 ## Project setup
 
