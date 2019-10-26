@@ -8,7 +8,7 @@ return [
     ],
     'tasks' => [
         'subtask' => [
-            'max' => env('MAX_SUBTASK', 5)
+            'max' => env('MAX_SUBTASK_DEPTH', 5)
         ]
     ]
 ];
